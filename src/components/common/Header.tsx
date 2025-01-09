@@ -1,4 +1,4 @@
-import { Menu } from 'antd';
+import { Menu, ConfigProvider } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -9,7 +9,7 @@ import { getUserProfileName } from '../../axios';
 type TypeDropDownItem = {
     key: string,
     label: string,
-    onClick?: () => void 
+    onClick?: () => void
 }
 
 const AppHeader = () => {
@@ -18,7 +18,7 @@ const AppHeader = () => {
     const [dropDownItems, setDropDownItems] = useState<TypeDropDownItem[]>([{
         key: 'log_in',
         label: 'Log in',
-        onClick: () => LogIn(),
+        onClick: () => LogIn()
     }])
 
     const navigate = useNavigate();
@@ -36,8 +36,8 @@ const AppHeader = () => {
         { key: 'howitworks', label: 'How it works' },
         {
             key: 'profile',
-            label: <i className="fa fa-user" aria-hidden="true"></i>,
-            children: dropDownItems
+            label: <UserOutlined />,
+            children: dropDownItems,
         }
     ];
 
@@ -68,31 +68,38 @@ const AppHeader = () => {
         setDropDownItems([
             {
                 key: 'log_out',
-                label: userProfileName,
-            },
-            {
-                key: 'log_out',
                 label: 'Log out',
-                onClick: () => LogOut(),
+                onClick: () => LogOut()
             }
         ])
     }
 
     return (
-        <div className="container-fluid">
-            <div className="header">
-                <div className="logo">
-                    <i className="fa fa-qrcode" aria-hidden="true"></i>
-                    <a href="http://google.com">QR_Connect</a>
+        <ConfigProvider
+            theme={{
+                components: {
+                    Menu: {
+                        itemHoverColor: "#1890ff",
+                        itemSelectedColor: "#1890ff"
+                    },
+                },
+            }}
+        >
+            <div className="container-fluid">
+                <div className="header">
+                    <div className="logo">
+                        <i className="fa fa-qrcode" aria-hidden="true"></i>
+                        <a href="http://google.com">QR_Connect</a>
+                    </div>
+                    <Menu
+                        mode="horizontal"
+                        defaultSelectedKeys={['home']}
+                        items={menuItems}
+                    />
+                    <p className="user_name">{userProfileName}</p>
                 </div>
-                <Menu
-                    mode="horizontal"
-                    defaultSelectedKeys={['home']}
-                    items={menuItems}
-                />
-                <p className="user_name">{userProfileName}</p>
             </div>
-        </div>
+        </ConfigProvider>
     );
 };
 

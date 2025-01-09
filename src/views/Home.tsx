@@ -1,8 +1,6 @@
-import React from 'react';
 import Hero from '../components/home/Hero';
 import About from '../components/home/About';
 import Feature from '../components/home/Feature';
-import Works from '../components/home/Works';
 import AppHeader from '../components/common/Header';
 import AppFooter from '../components/common/Footer';
 import { Layout } from 'antd';
@@ -21,7 +19,6 @@ const Home = () => {
                     <Hero />
                     <About />
                     <Feature />
-                    <Works />
                 </div>
             </Content>
             <Footer>
