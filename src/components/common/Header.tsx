@@ -2,7 +2,7 @@ import { Menu, ConfigProvider } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getToken, checkToken, getIDFromToken, clearToken } from '../../utils';
+import { getToken, checkIsTokenValid, getIDFromToken, clearToken } from '../../utils';
 import { getUserProfileName } from '../../axios';
 
 
@@ -13,6 +13,8 @@ type TypeDropDownItem = {
 }
 
 const AppHeader = () => {
+
+    const link = process.env.REACT_APP_HOST;
 
     const [userProfileName, setUserProfileName] = useState("");
     const [dropDownItems, setDropDownItems] = useState<TypeDropDownItem[]>([{
@@ -26,17 +28,17 @@ const AppHeader = () => {
 
     useEffect(() => {
         getUserName();
-    }, [token])
+    }, [])
 
 
     const menuItems = [
-        { key: 'home', label: 'Home' },
+        { key: 'home', label: 'Home', onClick: () => Home() },
         { key: 'about', label: 'About' },
         { key: 'features', label: 'Features' },
         { key: 'howitworks', label: 'How it works' },
         {
             key: 'profile',
-            label: <UserOutlined />,
+            label: <>{userProfileName} <i className="fa fa-user" aria-hidden="true"></i></>,
             children: dropDownItems,
         }
     ];
@@ -46,10 +48,20 @@ const AppHeader = () => {
             return;
         }
         try {
-            checkToken(token);
-            const id = getIDFromToken(token);
-            getUserProfileName(id, token, setUserProfileName);
-            authorizedDropDownItems()
+            const isValid = checkIsTokenValid(token);
+            if (isValid) {
+                const id = getIDFromToken(token);
+                console.dir({ id, token })
+                getUserProfileName(id, token, setUserProfileName);
+                authorizedDropDownItems()
+            } else {
+                clearToken();
+                setDropDownItems([{
+                    key: 'log_in',
+                    label: 'Log in',
+                    onClick: () => LogIn()
+                }])
+            }
         } catch (error) {
             clearToken();
         }
@@ -64,8 +76,22 @@ const AppHeader = () => {
         navigate('/login');
     }
 
+    const Setting = () => {
+        navigate('/setting');
+    }
+
+    const Home = () => {
+        navigate('/');
+    }
+
     const authorizedDropDownItems = () => {
         setDropDownItems([
+            {
+                key: 'settings',
+                label: 'Profile Settings',
+                onClick: () => Setting()
+
+            },
             {
                 key: 'log_out',
                 label: 'Log out',
@@ -80,7 +106,7 @@ const AppHeader = () => {
                 components: {
                     Menu: {
                         itemHoverColor: "#1890ff",
-                        itemSelectedColor: "#1890ff"
+
                     },
                 },
             }}
@@ -89,14 +115,12 @@ const AppHeader = () => {
                 <div className="header">
                     <div className="logo">
                         <i className="fa fa-qrcode" aria-hidden="true"></i>
-                        <a href="http://google.com">QR_Connect</a>
+                        <a href={link}>QR_Connect</a>
                     </div>
                     <Menu
                         mode="horizontal"
-                        defaultSelectedKeys={['home']}
                         items={menuItems}
                     />
-                    <p className="user_name">{userProfileName}</p>
                 </div>
             </div>
         </ConfigProvider>

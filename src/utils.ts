@@ -26,25 +26,27 @@ export const getToken = (): string | null => {
 }
 
 
-export const checkToken = (token: string | null): void => {
+export const checkIsTokenValid = (token: string | null): boolean => {
     if (!token) {
-        window.location.assign("http://localhost:3000/")
+        return false;
     } else {
         const decoded = jwtDecode(token);
         let exparation = decoded.exp as number;
         if (Date.now() > (exparation * 1000)) {
-            clearToken();
-            window.location.assign("http://localhost:3000/")
+            return false;
         }
+        return true;
     }
 }
 
 
-export const getIDFromToken = (token: string): number => {
+export const getIDFromToken = (token: string | null): number => {
+    if(!token) {
+        return 0;
+    }
     const decoded: ICustomJwtPayload = jwtDecode(token);
     return decoded.id;
 }
-
 
 export const clearToken = (): void => {
     localStorage.removeItem("token")
