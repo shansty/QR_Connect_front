@@ -1,5 +1,4 @@
 import { Menu, ConfigProvider } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getToken, checkIsTokenValid, getIDFromToken, clearToken } from '../../utils';
@@ -51,7 +50,6 @@ const AppHeader = () => {
             const isValid = checkIsTokenValid(token);
             if (isValid) {
                 const id = getIDFromToken(token);
-                console.dir({ id, token })
                 getUserProfileName(id, token, setUserProfileName);
                 authorizedDropDownItems()
             } else {

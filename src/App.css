@@ -319,10 +319,8 @@ p {
   }
 }
 
-
 /* 
   footer
-  ------
   */
 .ant-layout-footer {
   background: #111 !important;
@@ -412,23 +410,15 @@ Profile page
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 1px solid #ddd;
   padding: 20px;
-  border-radius: 10px;
-  background-color: #f9f9f9;
 }
-.profile-info div {
-  margin-bottom: 10px;
+
+.profile-img-block {
+  display: flex;
+  flex-direction: row;
 }
-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
+
+.profile-upload {
+  margin-left: 50px;
 }
-button:disabled {
-  background-color: #c0c0c0;
-  cursor: not-allowed;
-}
+

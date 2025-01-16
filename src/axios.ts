@@ -2,7 +2,6 @@ import axios from "axios";
 import { NavigateFunction } from "react-router-dom";
 import { getHeaders } from "./utils";
 import { FormInstance } from 'antd';
-import moment from "moment";
 import { LOGIN_URL, REGISTER_URL, PROFILE_URL } from "./configs/axios_urls";
 import dayjs from 'dayjs'
 
@@ -80,26 +79,23 @@ export const getUserProfileName = async (id: number, token: string, setUserProfi
 }
 
 
-export const getUserData = async (id: number,
-    token: string,
-    form: FormInstance,
-    setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-    setImageUrl: React.Dispatch<React.SetStateAction<string | null>>
-): Promise<void> => {
-    console.log("DEBUG getUserData start")
+export const getUserData = async (id: number, token: string, form: FormInstance, setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+    setImageUrl: React.Dispatch<React.SetStateAction<string | null>>): Promise<void> => {
+
     try {
         const response = await axios.get(`${PROFILE_URL}/userData/${id}`,
             {
                 headers: getHeaders(token)
             });
         const userData = response.data.userData;
+
         form.setFieldsValue({
             ...userData,
-            birthday: userData.birthday ? moment(userData.birthday) : null,
+            birthday: userData.birthday ? dayjs(userData.birthday, "YYYY-MM-DD") : null,
+            // birthday: userData.birthday ? dayjs(userData.birthday) : null,
         });
-        if (userData.profileImage) {
-            console.dir({userData})
-            setImageUrl(`http://localhost:3001${userData.profileImage}`);
+        if (userData.profileimage) {
+            setImageUrl(`http://localhost:3001${userData.profileimage}`);
         }
     } catch (err: any) {
         if (err.response.data) {
@@ -112,23 +108,21 @@ export const getUserData = async (id: number,
     }
 };
 
-export const updateProfile = async (
-    id: number,
-    token: string,
-    values: any,
-    form: FormInstance,
-    setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-    setImageUrl: React.Dispatch<React.SetStateAction<string | null>>
-): Promise<void> => {
+export const updateProfile = async (id: number, token: string, values: any, form: FormInstance, setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+    setImageUrl: React.Dispatch<React.SetStateAction<string | null>>): Promise<void> => {
+
     try {
         setLoading(true);
-
+        console.dir({ values_from_form: values })
         const formData = new FormData();
         Object.entries(values).forEach(([key, value]) => {
-            if (key === 'profileImage' && value instanceof File) {
-                formData.append(key, value); // Append the file
+            if (key === 'profileimage' && value instanceof File) {
+                formData.append(key, value);
+            } else if (key === 'birthday' && value) {
+                const formattedDate = dayjs(value as Date).format('YYYY-MM-DD');
+                formData.append(key, formattedDate);
             } else {
-                formData.append(key, value as string); // Append other fields
+                formData.append(key, value as string);
             }
         });
 
@@ -139,16 +133,20 @@ export const updateProfile = async (
             },
         });
 
-        console.dir({ response: response.data.userData });
+        console.dir({ response: response.data })
 
-        // Update form fields
         form.setFieldsValue({
             ...response.data.userData,
             birthday: dayjs(response.data.userData.birthday, "YYYY-MM-DD"),
+            // birthday: dayjs(response.data.userData.birthday), 
         });
 
-        if (response.data.userData.profileImage) {
-            setImageUrl(`http://localhost:3001${response.data.userData.profileImage}`);
+        const check = dayjs(response.data.userData.birthday, "YYYY-MM-DD")
+
+        console.dir({ data_dayjs: check })
+
+        if (response.data.userData.profileimage) {
+            setImageUrl(`http://localhost:3001${response.data.userData.profileimage}`);
         }
 
     } catch (err: any) {
@@ -162,56 +160,3 @@ export const updateProfile = async (
     }
 };
 
-
-
-        // const formData = new FormData();
-        // formData.append('user_name', values.user_name);
-        // formData.append('email', values.email);
-        // formData.append('phone_number', values.phone_number || '');
-        // formData.append('birthday', values.birthday.format('YYYY-MM-DD'));
-        // console.dir({file})
-        // if (file) {
-        //     formData.append('profileImage', file); 
-        // }
-
-
-//         // file: File | null, 
-// export const updateProfile = async (id: number,
-//     token: string,
-//     values: any,
-//     form: FormInstance,
-//     setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-//     setImageUrl: React.Dispatch<React.SetStateAction<string | null>>
-// ): Promise<void> => {
-//     try {
-//         setLoading(true);
-
-//         console.dir({ form, values })
-
-//         const response = await axios.put(`${PROFILE_URL}/${id}`, values, {
-//             headers: {
-//                 ...getHeaders(token),
-//                 'Content-Type': 'multipart/form-data',
-//             },
-//         });
-//         console.dir({response: response.data.userData})
-//         form.setFieldsValue({
-//             ...response.data.userData,
-//             birthday: dayjs(response.data.userData.birthday, "YYYY-MM-DD"),
-//         });
-//         if (response.data.userData.profileImage) {
-//             setImageUrl(`http://localhost:3001${response.data.userData.profileImage}`); 
-//         }
-
-
-//     } catch (err: any) {
-//         if (err.response.data) {
-//             window.alert(`${err.response.data.message}`);
-//         } else {
-//             window.alert(`Error: ${err}`);
-//         }
-//     } finally {
-//         setLoading(false);
-
-//     }
-// };
